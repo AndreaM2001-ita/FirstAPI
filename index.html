@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="sitoCss.css">	
+    </head>
+    <body>
+        <script>
+            function updateProfile() {
+                var name=document.getElementById('name1').textContent;
+                var email=document.getElementById('email1').textContent;
+                var hobby=document.getElementById('hobby1').textContent;
+                
+                document.getElementById('myProfile').style.display = 'none';
+                document.getElementById('editMyProfile').style.display = 'block';
+
+                document.getElementById('name').value = name;
+                document.getElementById('email').value  = email;
+                document.getElementById('hobby').value  = hobby;
+            }
+            function setValues(name, email, hobby){
+                document.getElementById('name1').textContent = name;
+                document.getElementById('email1').textContent = email;
+                document.getElementById('hobby1').textContent = hobby;
+            }
+            async function saveProfile() {
+                //var name=document.getElementById('name').value;
+                //var email=document.getElementById('email').value;
+                //var hobby=document.getElementById('hobby').value;
+                const payload = {
+                    name: document.getElementById('name').value, 
+                    email: document.getElementById('email').value, 
+                    hobby: document.getElementById('hobby').value
+                };
+                const response = await fetch('http://localhost:3000/user-update', {
+                    method: "POST",
+                    headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+
+                document.getElementById('myProfile').style.display = 'block';
+                document.getElementById('editMyProfile').style.display = 'none';
+                
+                setValues(payload.name, payload.email, payload.hobby)
+                
+            }
+
+            function reset(){
+                var name="Anna"
+                var email="anna.smith@example.com"
+                var hobby="Coding"
+                setValues(name, email, hobby)
+            }
+        </script>
+        <div class="input" id="myProfile">
+            <h1>My Profile</h1>
+                <span>Name: </span><h3 id="name1">Anna</h3>
+                <hr />
+                <span>Email: </span><h3 id="email1">anna.smith@example.com</h3>
+                <hr />
+                <span>Hobby: </span><h3 id="hobby1">Coding</h3>
+                <hr />
+                <button  class='button' onclick="updateProfile()">Update Profile</button>
+                <button class="button" onclick="reset()">Reset</button>
+        </div>
+        <div class="input" id="editMyProfile">
+            <h1>Edit My Profile</h1>
+                <label for="name">Name:</label><br>
+                <input type="text" id="name" name="name" value="Andrea"><br>
+                <label for="email">Email:</label><br>
+                <input type="text" id="email" name="email" value="anna.smith@example.com"><br>
+                <label for="hobby">Hobby:</label><br>
+                <input type="text" id="hobby" name="hobby" value="Coding"><br><br>
+                <button  class='button' onclick="saveProfile()">Save Profile</button>
+        </div>
+    </body>
+</html>
