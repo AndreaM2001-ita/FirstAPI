@@ -127,11 +127,24 @@ connectToDb((err)=>{
 
 //routes
 app.get('/user',(req,res)=>{
+    //current page
+    const page=req.query.page || 0;  //pahge is teh avriable used in URI
+    const booksperPage=3 //how many user do i want to show per page
+
     let users=[]
 
+    //CREATE INDEXING
+    //in mongo db temrinal
+    //db.user.createIndex({rating:10})
+    // db.user.getIndexes()
+    //db.user.dropIndex({ratingc:10})
+
     db.collection('user')
-      .find()
+      .find()//({"rating":10})
+      //.explain('executionStats')
       //.sort({name:1})
+      .skip(page*booksperPage)//skip pages if page is different from 0
+      .limit(booksperPage)
       .forEach(user=>users.push(user))
       .then(()=>{
         res.status(200).json(users)
@@ -143,6 +156,8 @@ app.get('/user',(req,res)=>{
 })
 
 app.get('/user/:name',(req,res)=>{  //:name is the interchanbale route parameter
+
+   
 
         db.collection('user')
         .findOne({name: req.params.name})
@@ -168,3 +183,45 @@ app.post('/user-update', function(req,res){//update current users
         res.status(500).json({error:"could not update the documents"})
     })
 })
+
+app.delete('/user/:name', function(req,res){
+    let name=req.params.name
+    if(name){
+        let myquery = { name: name }
+        db.collection('user')
+        .deleteOne(myquery)
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.status(500).json({error:"could not delete the user"})
+        });
+    }
+    else{
+        res.status(400).json({error:"name not found"})
+    }
+})
+
+//patch for update user
+app.patch('/user/:name', function(req,res){
+
+    const update=req.body
+
+    let name=req.params.name
+    let newValues={$set:update}
+    if(ObjectId.isValid(req.params.id)){//check id before update. do not check name id is unique
+        db.collection('user')
+        .updateOne({name: name},newValues)
+        .then(result => {
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            res.status(500).json({error:"could not update the user"})
+        });
+    }
+    else{
+        res.status(400).json({error:"name not found"})
+    }
+})
+
+//get only first document and then utilise pagination to show more
