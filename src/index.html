@@ -4,6 +4,22 @@
     </head>
     <body>
         <script>
+           (async function init() {
+                try {
+                    const response = await fetch('http://localhost:3000/get-profile');
+                    if (response.ok) {
+                        const user = await response.json();
+
+                        document.getElementById('name1').textContent = user?.name || 'Anna Smith';
+                        document.getElementById('email1').textContent = user?.email || 'anna.smith@example.com';
+                        document.getElementById('hobby1').textContent = user?.hobby || 'coding';
+                    } else {
+                        alert('Error fetching user profile');
+                    }
+                } catch (error) {
+                    alert('An error occurred: ' + error.message);
+                }
+            })();
             function updateProfile() {
                 var name=document.getElementById('name1').textContent;
                 var email=document.getElementById('email1').textContent;
@@ -56,11 +72,11 @@
         </script>
         <div class="input" id="myProfile">
             <h1>My Profile</h1>
-                <span>Name: </span><h3 id="name1">Anna</h3>
+                <span>Name: </span><h3 id="name1"></h3>
                 <hr />
-                <span>Email: </span><h3 id="email1">anna.smith@example.com</h3>
+                <span>Email: </span><h3 id="email1"></h3>
                 <hr />
-                <span>Hobby: </span><h3 id="hobby1">Coding</h3>
+                <span>Hobby: </span><h3 id="hobby1"></h3>
                 <hr />
                 <button  class='button' onclick="updateProfile()">Update Profile</button>
                 <button class="button" onclick="reset()">Reset</button>

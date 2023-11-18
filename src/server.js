@@ -93,9 +93,11 @@ app.get('/user', (req, res)=>{
     res.json({mssg: "welsome to the api"})
 });*/
 
-const express = require('express') //init node
-const {ObjectId} = require('mongodb')
-const {connectToDb,getDb}=require('./db')
+let express = require('express') //init node
+const ObjectId = require('mongodb').ObjectId;
+const dab = require('./db');
+const connectToDb = dab.connectToDb;
+const getDb = dab.getDb;
 
 const http=require('http')
 const fs=require('fs')
@@ -129,7 +131,7 @@ connectToDb((err)=>{
 app.get('/user',(req,res)=>{
     //current page
     const page=req.query.page || 0;  //pahge is teh avriable used in URI
-    const booksperPage=3 //how many user do i want to show per page
+    const booksperPage=8 //how many user do i want to show per page
 
     let users=[]
 
@@ -157,11 +159,21 @@ app.get('/user',(req,res)=>{
 
 app.get('/user/:name',(req,res)=>{  //:name is the interchanbale route parameter
 
-   
+    db.collection('user')
+    .findOne({name: req.params.name})
+    .then(doc=>{
+            res.status(200).json(doc)
+    })
+    .catch(err=> {
+        res.status(500).json({error:"could not fetch the documents"})
+    })
+})
 
+app.get('/get-profile',(req,res)=>{  
         db.collection('user')
-        .findOne({name: req.params.name})
+        .findOne()
         .then(doc=>{
+            
                 res.status(200).json(doc)
         })
         .catch(err=> {
@@ -209,7 +221,8 @@ app.patch('/user/:name', function(req,res){
 
     let name=req.params.name
     let newValues={$set:update}
-    if(ObjectId.isValid(req.params.id)){//check id before update. do not check name id is unique
+    //if(ObjectId.isValid(req.params.id)){//check id before update. do not check name id is unique
+    if(name)  {
         db.collection('user')
         .updateOne({name: name},newValues)
         .then(result => {
